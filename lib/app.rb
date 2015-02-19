@@ -1,5 +1,7 @@
 require "optparse"
 require 'byebug'
+require 'money'
+Money.use_i18n = false
 require_relative "charger/parser"
 
 options = {}

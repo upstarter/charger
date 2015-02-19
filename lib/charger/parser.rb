@@ -21,7 +21,7 @@ module Charger
     private
 
     def table_header
-      ["Name", "Balance"]
+      ["Name", "Card", "Balance"]
     end
 
     def table_rows

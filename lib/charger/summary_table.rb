@@ -27,9 +27,9 @@ module Charger
     def render_row row, r_index
       row.each_with_index do |cell, c_index|
         is_header = r_index == 0
-        is_last = row.size - 1 == c_index
+        is_first = c_index == 0
         output << render_cell(cell, r_index, c_index)
-        output << render_cell_separator(is_header, is_last)
+        output << render_cell_separator(is_header, is_first)
       end
       output << "\n"
     end
@@ -38,11 +38,11 @@ module Charger
       cell.to_s.rjust(padding)
     end
 
-    def render_cell_separator(is_header, is_last)
-      if is_header || is_last
-        "  "
-      else
+    def render_cell_separator(is_header, is_first)
+      if is_first && !is_header
         ": "
+      else
+        " "
       end
     end
 

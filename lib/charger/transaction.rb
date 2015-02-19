@@ -1,12 +1,8 @@
-require 'money'
-require 'byebug'
-Money.use_i18n = false
+require_relative 'card'
 
-#TODO: Refactor in order to delegate to Customer --> (HAS_MANY) --> Account(s) And Card classes in accordance
-# with solid design principles (single responsibility principle)
 module Charger
 	class Transaction
-    attr_reader :filename, :line, :customer, :account, :card
+    attr_reader :filename, :line, :customer, :card
     attr_accessor :type, :customer, :cc_num, :amount
 
     def initialize(filename)
@@ -14,15 +10,15 @@ module Charger
 
       @customers = Hash.new do |h, key|
         h[key] = Hash.new
-        h[key][:limit] = 0
-        h[key][:balance] = 0
+        h[key][:cards] = []
       end
     end
 
     def process
       File.open(filename, "r") do |file|
         file.each_line do |line|
-          populate(line)
+          line = arrange_data(line)
+          populate_self(line)
           coerce_vars
           transact(type)
         end
@@ -32,19 +28,36 @@ module Charger
 
 private
 
-    def populate(line)
-      data = line.split(' ')
-      if data.first == "Add"
-        @type, @customer, @cc_num, @amount = data
+    def arrange_data(line)
+      line = line.split(' ')
+      @new_card = line[0] == "Add"
+      line[1] = line[1].capitalize.to_sym
+      if new_card?
+        line[3] = Money.new(line[3][/\d+/], "USD") * 100
+      end
+      line
+    end
+
+    def populate_self(line)
+      if line.first == "Add"
+        @type, @customer, @cc_num, @amount = line
+        @card = find_card
       else
-        @type, @customer, @amount = data
+        @type, @customer, @amount = line
+        @card = @customers[customer][:cards].first
       end
     end
 
     def coerce_vars
       self.type = coerce_type # correct erroneous terminology of input
       self.customer = customer.capitalize.to_sym
-      self.amount = Money.new(amount[/\d+/], "USD") * 100
+      unless new_card?
+        self.amount = Money.new(amount[/\d+/], "USD") * 100
+      end
+    end  
+
+    def new_card?
+      @new_card
     end
 
     def coerce_type
@@ -60,64 +73,38 @@ private
       correct_type
     end
 
+    def find_card
+      @customers[customer]
+      card = @customers[customer][:cards].find { |card| card.number == @cc_num }
+
+      unless card
+        card = Card.new(number: @cc_num, limit: @amount)
+        @customers[customer][:cards] << card
+      end
+      card
+    end
+
     def arrange_rows
       @customers.inject([]) do |acc, customer|
-        acc << render_row(customer)
+        card = customer.last[:cards].first
+        acc << render_row(customer, card)
       end
     end
 
-    def render_row(customer)
-      out = if customer.last[:cc_num_valid]
-              customer.last[:balance].format
+    def render_row(customer, card)
+      msg = card.balance.zero? ? "$0" : card.balance.format
+      out = if card.valid
+              msg
             else
               "error"
             end
-      [customer.first.to_s.capitalize, out]
+      [customer.first.to_s.capitalize, card.number, out]
     end
 
     def transact(type)      
-      send(type)
-    end
-
-    def add
-      @customers[customer]
-      @customers[customer][:cc_num] = cc_num
-      @customers[customer][:limit] = amount
-      @customers[customer][:cc_num_valid] = luhn_check
-    end
-
-    def credit
-      return if overlimit?
-      @customers[customer][:balance] += amount
-    end
-
-    def debit
-      @customers[customer][:balance] -= amount
-    end
-
-    def limit
-      @customers[customer][:limit]
-    end
-
-    def balance
-      @customers[customer][:balance]
-    end
-
-    def overlimit?
-      balance + amount > limit
-    end
-
-    def luhn_check
-      s1 = s2 = 0
-      cc_num.to_s.reverse.chars.each_slice(2) do |odd, even| 
-        s1 += odd.to_i
-     
-        double = even.to_i * 2
-        double -= 9 if double >= 10
-        s2 += double
-      end
-      (s1 + s2) % 10 == 0
+      @card.send(type, amount) unless type == :add
     end
 
   end
+
 end

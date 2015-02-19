@@ -2,62 +2,50 @@
 
 Basic Credit Card Processing
 ----------------------------
- 
-Imagine that you're writing software for a credit card provider.  Implement a program that will add new credit card accounts, process charges and credits against them, and display summary information.
- 
-Requirements:
-- three input commands must be handled, passed with space delimited arguments, via stdin or a file passed on the command line
-- "Add" will create a new credit card for a given name, card number, and limit
-   - Card numbers should be validated using Luhn 10
-   - New cards start with a $0 balance
-- "Charge" will increase the balance of the card associated with the provided name by the amount specified
-   - Charges that would raise the balance over the limit are ignored as if they were declined
-   - Charges against Luhn 10 invalid cards are ignored
-- "Credit" will decrease the balance of the card associated with the provided name by the amount specified
-   - Credits that would drop the balance below $0 will create a negative balance
-   - Credits against Luhn 10 invalid cards are ignored
-- when all input has been read and processed, a summary should be generated and written to stdout
-- the summary should include the name of each person followed by a colon and balance
-- the names should be displayed alphabetically
-- display "error" instead of the balance if the credit card number does not pass Luhn 10
- 
-Input Assumptions:
-- all input will be space delimited
-- credit card numbers may vary in length, up to 19 characters
-- credit card numbers will always be numeric
-- amounts will always be prefixed with "$" and will be in whole dollars (no decimals)
- 
-Example Input:
- 
-```
-Add Tom 4111111111111111 $1000
-Add Lisa 5454545454545454 $3000
-Add Quincy 1234567890123456 $2000
-Charge Tom $500
-Charge Tom $800
-Charge Lisa $7
-Credit Lisa $100
-Credit Quincy $200
-```
- 
-Example Output:
- 
-```
-Lisa: $-93
-Quincy: error
-Tom: $500
-```
- 
-Implement your solution in any programming language you wish, but keep in mind we may ask you to explain or extend your code.  Please write tests and include them with your submission, along with a README that includes usage instructions, an overview of your design decisions, and why you picked the programming language you used for the solution.
- 
-*** Note: this information is confidential. It is prohibited to share, post online or otherwise publicize without Braintree's prior written consent. ***
 
-## Installation
+This is a very basic credit card processing program to demonstrate knowledge of Object Oriented Programming practices for payments processing.
+
+## Usage
+
+Ensure you have ruby installed ( the program was developed and tested using Ruby 2.1.5p273 and Rspec version 3.2.0).
 
 And then execute:
 
     $ ruby lib/app.rb
 
-## Usage
+Tests are in the /spec folder. In the interest of time, adding tests for the code used for rendering output on the command line was skipped.
 
-TODO: Write usage instructions here
+## Design Decisions
+
+The program was built using SOLID principles. In thinking of future requirements, the architecture supports multiple customer accounts(cards). Currently, without a database or framework like Rails, the Card model is synonomous with a customer account, but could easily be adapted to support a seperate Account model with possibly many cards. The code can also easily be changed to allow the transactions to include multiple cards per user. 
+
+For example, a future refactoring may look like:
+
+Customer --> (HAS_MANY) --> Account(s) --> (HAS_MANY) --> Cards 
+
+or, in Rails lingo, something like:
+
+class Customer
+	has_many :accounts
+	has_many :cards, through: :accounts
+end
+
+class Account
+	belongs_to :customer
+	has_many :cards
+end
+
+class Card
+	belongs_to :account
+
+	delegate :customer, to: :account
+end
+
+Caveats:
+
+In the implementation, the terms "credit" and "debit" replace "Charge" and "Credit", with the function of increasing and decreasing the balance respectively. This is to respect standardization in the accounting profession.
+
+
+## Why Ruby?
+
+I chose Ruby because of it's terse syntax and the ease of which prototyping can be rapidly implemented, the availability of a wide variety of libraries(gems), as well as the general feeling of happiness that comes from daily use.
