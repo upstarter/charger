@@ -1,11 +1,12 @@
 require 'money'
+require 'byebug'
 Money.use_i18n = false
 
-#TODO: REFACTOR IN ORDER TO DELEGATE TO ACCOUNT AND CARD CLASSES IN ACCORDANCE
-# WITH SOLID DESIGN PRINCIPLES (SINGLE RESPONSIBILITY PRINCIPLE)
+#TODO: Refactor in order to delegate to Customer --> (HAS_MANY) --> Account(s) And Card classes in accordance
+# with solid design principles (single responsibility principle)
 module Charger
-	class Transactioner
-    attr_reader :filename, :line
+	class Transaction
+    attr_reader :filename, :line, :customer, :account, :card
     attr_accessor :type, :customer, :cc_num, :amount
 
     def initialize(filename)
@@ -21,7 +22,6 @@ module Charger
     def process
       File.open(filename, "r") do |file|
         file.each_line do |line|
-          reset
           populate(line)
           coerce_vars
           transact(type)
@@ -31,10 +31,6 @@ module Charger
     end
 
 private
-
-    def reset
-      @type, @customer, @cc_num, @amount = nil
-    end
 
     def populate(line)
       data = line.split(' ')

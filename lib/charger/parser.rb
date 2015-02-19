@@ -1,16 +1,16 @@
 require_relative "version"
 require_relative "summary_table"
-require_relative "transactioner"
+require_relative "transaction"
 
 module Charger
   class Parser
-    attr_reader :filename, :data
+    attr_reader :filename, :data, :transaction
 
     DEFAULT_FILE = 'input.txt'
 
-    def initialize filename=DEFAULT_FILE
+    def initialize(filename=DEFAULT_FILE, transaction_class=Transaction)
       @filename = filename || DEFAULT_FILE
-      @transactioner = Transactioner.new(@filename)
+      @transaction = transaction_class.new(@filename)
       @data = table_data
     end
 
@@ -25,7 +25,7 @@ module Charger
     end
 
     def table_rows
-      @transactioner.process
+      @transaction.process
     end
 
     def table_data
