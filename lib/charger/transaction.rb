@@ -98,7 +98,7 @@ private
             else
               "error"
             end
-      [customer.first.to_s.capitalize, card.number, out]
+      [customer.first.to_s.capitalize, out]
     end
 
     def transact(type)      

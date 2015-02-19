@@ -42,7 +42,7 @@ module Charger
       if is_first && !is_header
         ": "
       else
-        " "
+        "  "
       end
     end
 

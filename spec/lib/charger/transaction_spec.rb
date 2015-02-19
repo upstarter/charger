@@ -7,9 +7,9 @@ describe Charger::Transaction do
   let(:filename) { "input.txt" }
   let(:expected_data) do
     [
-      ["Tom", "4111111111111111", "$500.00"],
-      ["Lisa", "5454545454545454", "$-93.00"],
-      ["Quincy", "1234567890123456", "error"]
+      ["Tom", "$500.00"],
+      ["Lisa", "$-93.00"],
+      ["Quincy", "error"]
     ]
   end
 
