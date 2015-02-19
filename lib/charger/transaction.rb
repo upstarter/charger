@@ -83,7 +83,7 @@ private
       @customers[customer]
       @customers[customer][:cc_num] = cc_num
       @customers[customer][:limit] = amount
-      @customers[customer][:cc_num_valid] = credit_card_valid?
+      @customers[customer][:cc_num_valid] = luhn_check
     end
 
     def credit
@@ -107,16 +107,17 @@ private
       balance + amount > limit
     end
 
-    def credit_card_valid?
-      # using luhn10
-      digits = cc_num.scan(/./).map(&:to_i)
-      check = digits.pop
-
-      sum = digits.reverse.each_slice(2).map do |x, y|
-        [(x * 2).divmod(10), y || 0]
-      end.flatten.inject(:+)
-
-      (10 - sum % 10) == check
+    def luhn_check
+      s1 = s2 = 0
+      cc_num.to_s.reverse.chars.each_slice(2) do |odd, even| 
+        s1 += odd.to_i
+     
+        double = even.to_i * 2
+        double -= 9 if double >= 10
+        s2 += double
+      end
+      (s1 + s2) % 10 == 0
     end
+
   end
 end
