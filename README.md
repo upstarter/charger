@@ -3,7 +3,7 @@
 Basic Credit Card Processing
 ----------------------------
 
-This is a very basic credit card processing program to demonstrate knowledge of Object Oriented Programming practices for payments processing.
+This is a credit card processing microservice to demonstrate knowledge of Object Oriented Modeling practices for payments oriented purposes.
 
 ## Usage
 
@@ -15,36 +15,15 @@ And then execute:
 
 Tests are in the /spec folder. In the interest of time, adding tests for the code used for rendering output on the command line was skipped.
 
+To run tests:
+
+    $ rspec spec/
+
 ## Design Decisions
 
-The program was built using SOLID principles. In thinking of future requirements, the architecture supports multiple customer accounts(cards). Currently, without a database or framework like Rails, the Card model is synonomous with a customer account, but could easily be adapted to support a seperate Account model with possibly many cards. The code can also easily be changed to allow the transactions to include multiple cards per user. 
+The design of this solution to customer events was inspired by the Erlang OTP actor style Supervisor/Worker paradigm. The Object model was envisioned as a data supervision tree mixed with a data pipelining Microservice performing ETL functions. Not exactly perfect for a high performance transaction system, but useful as an exercise in OO Modeling of customer solutions.
 
-For example, a future refactoring may look like:
-
-Customer --> (HAS_MANY) --> Account(s) --> (HAS_MANY) --> Cards 
-
-or, in Rails lingo, something like:
-
-class Customer
-	has_many :accounts
-	has_many :cards, through: :accounts
-end
-
-class Account
-	belongs_to :customer
-	has_many :cards
-end
-
-class Card
-	belongs_to :account
-
-	delegate :customer, to: :account
-end
-
-Caveats:
-
-In the implementation, the terms "credit" and "debit" replace "Charge" and "Credit", with the function of increasing and decreasing the balance respectively. This is to respect standardization in the accounting profession.
-
+One could easily repurpose this app for messaging to/from an event bus or to do analysis on Large Datasets. Think of the Charger::Supervisor as the High Level Policy object that directs the action of and collects results from the subordinate Charger::Transactions::Supervisor whom coordinates it's workers to filter/enrich the information for the supervisor whom can direct more work based on real time accumulative and/or terminal results. Supervisors are coupled to eachother and workers so as to facilitate a high level of coordination in the implementation of cohesive strategic policies.
 
 ## Why Ruby?
 

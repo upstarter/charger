@@ -1,5 +1,3 @@
-require_relative "parser"
-
 module Charger
   class SummaryTable
     attr_reader :data
