@@ -17,11 +17,15 @@ Tests are in the /spec folder. In the interest of time, adding tests for the cod
 
 ## Design Decisions
 
-The program was built using SOLID principles. In thinking of future requirements, the architecture supports multiple customer accounts(cards). Currently, without a database or framework like Rails, the Card model is synonomous with a customer account, but could easily be adapted to support a seperate Account model with possibly many cards. The code can also easily be changed to allow the transactions to include multiple cards per user. 
+The design was inspired by the Erlang OTP actor style Supervisor/Worker paradigm. The Object model was envisioned as a data supervision tree mixed with a data pipelining Microservice performing ETL functions. Not exactly perfect for a high throughput transaction system, but useful nonetheless.
+
+One could easily repurpose this app for messaging to/from an event bus or to do analysis on Large Datasets. Think of the Charger::Supervisor as the High Level Policy object that directs the action of and collects results from the subordinate Charger::Transactions::Supervisor whom directs it's workers in the completion of small amounts of work on vectors to enrich information for the supervisor which can direct more work based on accumulative and/or terminal results and in "real time". Supervisors are coupled to eachother and workers so as to allow a high level of coordination in the successful implementation of the policies.
+
+The program was built using SOLID principles. In thinking of future requirements, the architecture supports multiple customer accounts(cards). Currently, without a database or framework like Rails, the Card model is synonomous with a customer account, but could easily be adapted to support a seperate Account model with possibly many cards. The code can also easily be changed to allow the transactions to include multiple cards per user.
 
 For example, a future refactoring may look like:
 
-Customer --> (HAS_MANY) --> Account(s) --> (HAS_MANY) --> Cards 
+Customer --> (HAS_MANY) --> Account(s) --> (HAS_MANY) --> Cards
 
 or, in Rails lingo, something like:
 
@@ -40,10 +44,6 @@ class Card
 
 	delegate :customer, to: :account
 end
-
-Caveats:
-
-In the implementation, the terms "credit" and "debit" replace "Charge" and "Credit", with the function of increasing and decreasing the balance respectively. This is to respect standardization in the accounting profession.
 
 
 ## Why Ruby?

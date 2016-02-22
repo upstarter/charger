@@ -1,16 +1,13 @@
 require "optparse"
 require 'byebug'
-require 'money'
-Money.use_i18n = false
-require_relative "charger/parser"
-
+require_relative "supervisor"
 options = {}
 
 OptionParser.new do |opts|
   opts.banner = "Usage: #$0 -f file"
 
   opts.on "-f", "--file FILENAME", "Input text file name (defaults to 'input.txt')" do |s|
-    options[:file] = f
+    options[:file] = s
   end
 
   opts.on "-h", "--help", "Shows usage" do
@@ -19,4 +16,4 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-Charger::Parser.new(options[:file]).render
+Charger::Supervisor.new(input: options[:file]).extract.draw
