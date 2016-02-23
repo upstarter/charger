@@ -30,18 +30,17 @@ module Charger
         balance = customer.balance == "error" ? "error" : customer.balance.format
         [customer.name, balance]
       end
-      self
     end
 
     def draw
       @view.draw data
     end
 
-  private
-
     def data
       [head] + @tail
     end
+
+  private
 
     def head
       ["Name", "Balance"]

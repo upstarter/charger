@@ -16,4 +16,6 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-Charger::Supervisor.new(input: options[:file]).extract.draw
+supervisor = Charger::Supervisor.new(input: options[:file])
+supervisor.extract
+supervisor.draw

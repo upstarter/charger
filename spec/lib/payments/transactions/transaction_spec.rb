@@ -1,8 +1,8 @@
 require 'money'
 Money.use_i18n = false
 
-require_relative "../../../lib/payments/transactions/transaction"
-require_relative '../../../lib/customers/card'
+require_relative "../../../../lib/payments/transactions/transaction"
+require_relative '../../../../lib/customers/card'
 
 
 describe Charger::Transactions::Transaction do

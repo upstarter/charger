@@ -1,5 +1,5 @@
 require_relative "transaction"
-require_relative "transform"
+require_relative "../../event_handler"
 
 module Charger
   module Transactions
@@ -9,16 +9,16 @@ module Charger
       def initialize(supervisor:)
         @supervisor = supervisor
         @customers = Set.new
-        @transform = Charger::Transactions::Transform.new
+        @handler = Charger::EventHandler.new
       end
 
       def transact(event)
-        @response = @transform.process(event: event, supervisor: self)
+        @response = @handler.process(event: event, supervisor: self)
         add_customer
 
         if card? && !new_card?
           @transaction = Charger::Transactions::Transaction.process(data: @response)
-          [:"successful_#{transaction_type.downcase}", customer.name, "$#{@transform.amount.to_f}"]
+          [:"successful_#{transaction_type.downcase}", customer.name, "$#{@handler.amount.to_f}"]
         elsif card? && new_card?
           @response
         elsif !card?
@@ -26,18 +26,16 @@ module Charger
         end
       end
 
-      # ENRICHMENT SERVICES
-
       def new_card?
-        @transform.new_card?
+        @handler.new_card?
       end
 
       def invalid_card?
-        @transform.invalid_card?
+        @handler.invalid_card?
       end
 
       def transaction_type
-        @transform.transaction_type
+        @handler.transaction_type
       end
 
       def add_customer
@@ -46,11 +44,11 @@ module Charger
       end
 
       def customer
-        @transform.customer
+        @handler.customer
       end
 
       def card?
-        @transform.card
+        @handler.card
       end
     end
   end

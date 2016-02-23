@@ -15,6 +15,8 @@ describe Charger::Supervisor do
 
   subject { described_class.new(input: file) }
 
+  before { subject.extract }
+
   it "draws output using a view" do
     expect(Charger::SummaryTable).to receive(:draw).with(subject.data)
     subject.draw

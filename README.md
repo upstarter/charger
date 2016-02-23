@@ -13,6 +13,14 @@ And then execute:
 
     $ ruby lib/app.rb
 
+    - OR SPECIFY FILE -
+
+    $ ruby lib/app.rb 'input.txt'
+
+    - OR STDIN -
+
+    $ ruby lib/app.rb < input.txt
+
 Tests are in the /spec folder. In the interest of time, adding tests for the code used for rendering output on the command line was skipped.
 
 To run tests:

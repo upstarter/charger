@@ -18,7 +18,7 @@ module Charger
       self.cards << card
     end
 
-    def balance
+    def balance(card: nil)
       return "error" if self.cards.empty? || self.cards.all? { |card| !card.valid? }
       balance = self.cards.inject(0) { |sum, card| sum += card.balance }
       Money.new(balance, :usd)
