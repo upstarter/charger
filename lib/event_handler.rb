@@ -3,7 +3,8 @@ require_relative 'customers/card'
 
 # This generic low level class is an example of a worker that
 # deciphers and potentially enriches events via collaborators for upstream
-# decisions. Could go in transactions/workers/ folder in future
+# decisions. Could go in transactions/workers/ folder in future for async
+# event driven architecture
 
 module Charger
   class EventHandler
