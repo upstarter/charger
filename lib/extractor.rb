@@ -1,10 +1,3 @@
-# I attached your originally solution and the new instructions for the code challenge. Reminder, now it has to read input from file and STDIN.
-
-# My main concern is his strength in OO modeling.
-# - Test coverage is incomplete, but at least he mentions this in the Readme
-# - Overall, idiomatic ruby. Red flag-  sending signals via instance variables, rather than passing variables as arguments to methods.
-#  more design rationale in Readme as well as instructions on how to run tests, but still fine.
-
 require_relative 'payments/transactions/transaction'
 require_relative 'payments/transactions/supervisor'
 
@@ -23,7 +16,6 @@ module Charger
       if ARGV.empty? || ARGV.include?('input.txt') || ENV['RACK_ENV'] = 'test'
         take_file
       else
-        byebug
         take_stdin
       end
     end

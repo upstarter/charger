@@ -1,17 +1,15 @@
 require 'money'
+require 'byebug'
 require_relative "version"
 require_relative "views/summary_table"
 require_relative "extractor"
 Money.use_i18n = false
 
-require 'byebug'
-
 module Charger
   class Supervisor
+    DEFAULT_FILE = 'input.txt'
     attr_reader :input, :matrix
     attr_accessor :customers
-
-    DEFAULT_FILE = 'input.txt'
 
     def initialize(input:, extractor: Extractor, view: Charger::SummaryTable)
       @input = input || DEFAULT_FILE
